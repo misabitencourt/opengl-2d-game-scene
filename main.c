@@ -18,7 +18,7 @@ Draw(void)
 {
         int i;
         glLoadIdentity();
-        glTranslatef(0.0, 0.0, -3.6);
+        glTranslatef(0.0, 0.0, -1.0);
         glRotatef(0, 0,1,0);
         glRotatef(0, 1,0,0);
         glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -48,9 +48,12 @@ Draw(void)
         // } 
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexImage2D(GL_TEXTURE_2D, 0, 4, sprites[1].frame_width,
-                        sprites[1].height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                        get_frame_image(sprites[1]));
+        // glTexImage2D(GL_TEXTURE_2D, 0, 4, sprites[1].frame_width,
+        //                 sprites[1].height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+        //                 get_sprite_frame_image(sprites[1]));
+        glTexImage2D(GL_TEXTURE_2D, 0, 4, SCREEN_WIDTH,
+                        SCREEN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                        mount_scene());
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);                        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -58,9 +61,9 @@ Draw(void)
         
         glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); glVertex2f(0.0f, 0.0f);
-        glTexCoord2f(1.0, 0.0); glVertex2f(sprites[1].frame_width / 100.0f, 0.0f);
-        glTexCoord2f(1.0, 1.0); glVertex2f(sprites[1].frame_width / 100.0f, sprites[1].height / 100.0f);
-        glTexCoord2f(0.0, 1.0); glVertex2f(0.0f, sprites[1].height / 100.0f);
+        glTexCoord2f(1.0, 0.0); glVertex2f(1.0f, 0.0f);
+        glTexCoord2f(1.0, 1.0); glVertex2f(1.0f, 1.0f);
+        glTexCoord2f(0.0, 1.0); glVertex2f(0.0f, 1.0f);
         glEnd();
 
 

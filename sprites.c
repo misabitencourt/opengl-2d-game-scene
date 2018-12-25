@@ -1,6 +1,4 @@
-Sprite sprites[100];
-int MAX_SPRITES = 100;
-int SPRITE_CHAR = 1;
+Sprite sprites[10];
 
  Sprite read_png_file(char * file_name) 
  {
@@ -96,25 +94,108 @@ void load_sprites()
     sprites[SPRITE_CHAR].frame_width = 19;
     sprites[SPRITE_CHAR].frame_current = 2;
     sprites[SPRITE_CHAR].frame_delay = 0;
+    sprites[SPRITE_CHAR].x = CHAR_INITIAL_POS_X;
+    sprites[SPRITE_CHAR].y = CHAR_INITIAL_POS_Y;
 
+    sprites[TILESET_IMG] = read_png_file("./tilesets/tileset.png");
 }
 
-GLubyte * get_frame_image(Sprite sprite)
+GLubyte * get_sprite_frame_image(Sprite sprite)
 {
     unsigned int frame_row_bytes = sizeof(png_bytep);
-    GLubyte * ret = malloc(frame_row_bytes * sprite.frame_width * sprite.height);
+    int frame_total_bytes = frame_row_bytes * sprite.frame_width * sprite.height;
+    GLubyte * ret = malloc(frame_total_bytes);
 
-    for (int i = 0; i<sprite.height; i++) {
-        GLubyte * row_pointer = ret + (frame_row_bytes * sprite.frame_width * sprite.height) - (frame_row_bytes * (sprite.height-i-1) * sprite.frame_width);
+    for (int i=0; i<sprite.height; i++) {
+        GLubyte * row_pointer = ret + frame_total_bytes - (frame_row_bytes * (sprite.height-i) * sprite.frame_width);
         GLubyte * frame_pointer = sprite.image + // Sprite first pixel pointer
-                                  (sprite.width * (sprite.frame_current-1) * 4) + // Jump to frame pixels
-                                  ((i-1) * sprite.width * 4); // Jump to current line;
+                                  (sprite.width * (sprite.frame_current-1) * frame_row_bytes) + // Jump to frame pixels
+                                  (i * sprite.width * frame_row_bytes); // Jump to current line;
 
-        printf("\r\nCopying to:%i from:%i %i bytes", row_pointer, frame_pointer, sprite.frame_width);
+        printf("\r\nCopying to:%i from:%i", row_pointer, frame_pointer);
         memcpy(row_pointer,
                frame_pointer, 
-               sprite.frame_width*4);
+               sprite.frame_width * frame_row_bytes);
     }
 
     return ret;
+}
+
+GLubyte * mount_bkg_tileset()
+{
+    unsigned int frame_row_bytes = sizeof(png_bytep);
+    const int to_paint_bytes = frame_row_bytes * TILESET_SIZE * TILESET_SIZE;
+    GLubyte * to_paint = malloc(to_paint_bytes);
+    Sprite tileset = sprites[TILESET_IMG];
+    GLubyte * frame_pointer = tileset.image;
+    memcpy(to_paint, tileset.image, to_paint_bytes);
+    const int scene_end = frame_row_bytes * SCREEN_WIDTH * SCREEN_HEIGHT;
+    GLubyte * scene = malloc(scene_end);
+    int current_tileset_line = 0;
+    int w_bkg_painted = 0;
+    int h_bkg_painted = 0;
+
+    // BACKGROUND
+    while (h_bkg_painted <= SCREEN_HEIGHT) {
+        while (w_bkg_painted <= SCREEN_WIDTH) {
+            GLubyte * dest = scene + (h_bkg_painted * SCREEN_WIDTH * frame_row_bytes) + 
+                                     (w_bkg_painted * frame_row_bytes);
+            GLubyte * src = to_paint + (current_tileset_line * TILESET_SIZE * frame_row_bytes);
+            memcpy(dest, src, frame_row_bytes * TILESET_SIZE);
+            w_bkg_painted += TILESET_SIZE;
+        }
+        w_bkg_painted = 0;
+        h_bkg_painted += 1;
+        current_tileset_line = (current_tileset_line >= (TILESET_SIZE-1)) ? 0 : 
+                               (current_tileset_line + 1);
+    }
+
+    free(to_paint);
+
+    return scene;
+}
+
+void add_to_scene(GLubyte * scene, GLubyte * sprite_frame, int x, int y, int w, int h)
+{
+    unsigned int frame_row_bytes = sizeof(png_bytep);
+    int printed_lines = 0;
+
+    w = ((x + w) > SCREEN_WIDTH) ? ((w + x) - SCREEN_WIDTH) : w;
+    h = ((y + h) > SCREEN_HEIGHT) ? ((y + h) - SCREEN_HEIGHT) : h;
+
+    while (printed_lines != h) {
+        GLubyte * dest = scene + (y * SCREEN_WIDTH * frame_row_bytes) + 
+                                 (printed_lines * SCREEN_WIDTH * frame_row_bytes) + 
+                                 (x * frame_row_bytes);
+        GLubyte * src = sprite_frame + (frame_row_bytes * printed_lines * w);
+        memcpy(dest, src, w * frame_row_bytes);
+        printed_lines += 1;
+    }
+}
+
+GLubyte * mount_scene()
+{
+    // CREATE BACKGROUND
+    GLubyte * scene = mount_bkg_tileset();
+
+    // LIST ACTORS
+    const int actors_count = 1;
+    Sprite scene_actors[actors_count];
+    scene_actors[0] = sprites[SPRITE_CHAR];
+
+    // ADD ACTORS IMAGE TO SCENE
+    for (int i=0; i<actors_count; i++) {
+        printf("%i actor", i);
+        GLubyte * actor_frame = get_sprite_frame_image(scene_actors[i]);
+        add_to_scene(
+            scene, 
+            actor_frame, 
+            scene_actors[i].x, 
+            scene_actors[i].y, 
+            scene_actors[i].frame_width,
+            scene_actors[i].height
+        );
+    }
+
+    return scene;
 }
