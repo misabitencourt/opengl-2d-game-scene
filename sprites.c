@@ -1,3 +1,4 @@
+State game_state;
 Sprite sprites[10];
 
  Sprite read_png_file(char * file_name) 
@@ -99,7 +100,7 @@ void load_sprites()
     sprites[SPRITE_CHAR].frame_delay = 0;
     sprites[SPRITE_CHAR].x = CHAR_INITIAL_POS_X;
     sprites[SPRITE_CHAR].y = CHAR_INITIAL_POS_Y;
-    sprites[SPRITE_CHAR].frame_delay = 200;
+    sprites[SPRITE_CHAR].frame_delay = 50;
     sprites[SPRITE_CHAR].frame_delay_current = 0;
 
     sprites[TILESET_IMG] = read_png_file("./tilesets/tileset.png");
@@ -107,6 +108,7 @@ void load_sprites()
 
 GLubyte * get_sprite_frame_image(Sprite sprite)
 {
+    // Frame update
     sprite.frame_delay_current += 1;
     if (sprite.frame_delay_current > sprite.frame_delay) {
         sprite.frame_current = sprite.frame_current + 1;
@@ -116,7 +118,7 @@ GLubyte * get_sprite_frame_image(Sprite sprite)
         sprite.frame_delay_current = 0;
     }
     
-    printf("\r\nFRAME: %i, %i, %i", sprite.frame_current, sprite.frame_start, sprite.frame_end);
+    // printf("\r\nFRAME: %i, %i, %i", sprite.frame_current, sprite.frame_start, sprite.frame_end);
     sprites[SPRITE_CHAR] = sprite;
     unsigned int frame_row_bytes = sizeof(png_bytep);
     int frame_total_bytes = frame_row_bytes * sprite.frame_width * sprite.height;
@@ -189,10 +191,36 @@ void add_to_scene(GLubyte * scene, GLubyte * sprite_frame, int x, int y, int w, 
     }
 }
 
+void controls()
+{
+    Sprite sprite_char = sprites[SPRITE_CHAR];
+
+    if (game_state.up) {
+        sprite_char.y += 1;
+    } else if (game_state.down) {
+        sprite_char.y -= 1;
+    } else if (game_state.left) {
+        sprite_char.x -= 1;
+    } else if (game_state.right) {
+        sprite_char.x += 1;
+    }
+
+    sprite_char.x = sprite_char.x < 0 ? 0 : sprite_char.x;
+    sprite_char.y = sprite_char.y < 0 ? 0 : sprite_char.y;
+    
+    sprite_char.x = sprite_char.x > SCREEN_WIDTH ? SCREEN_WIDTH : sprite_char.x;
+    sprite_char.y = sprite_char.y > SCREEN_HEIGHT ? SCREEN_HEIGHT : sprite_char.y;
+
+    sprites[SPRITE_CHAR] = sprite_char;
+}
+
 GLubyte * mount_scene()
 {
     // CREATE BACKGROUND
     GLubyte * scene = mount_bkg_tileset();
+
+    // Controls
+    controls();
 
     // LIST ACTORS
     const int actors_count = 1;
