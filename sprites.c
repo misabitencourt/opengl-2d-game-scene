@@ -91,17 +91,33 @@ Sprite sprites[10];
 void load_sprites()
 {   
     sprites[SPRITE_CHAR] = read_png_file("./sprites/char.png");
-    sprites[SPRITE_CHAR].frame_width = 19;
-    sprites[SPRITE_CHAR].frame_current = 2;
+    sprites[SPRITE_CHAR].frame_width = 32;
+    sprites[SPRITE_CHAR].frame_current = 1;
+    sprites[SPRITE_CHAR].animation = CHAR_ANIMATION_WALKING_DOWN;
+    sprites[SPRITE_CHAR].frame_start = CHAR_ANIMATION_WALKING_DOWN_START;
+    sprites[SPRITE_CHAR].frame_end = CHAR_ANIMATION_WALKING_DOWN_END;
     sprites[SPRITE_CHAR].frame_delay = 0;
     sprites[SPRITE_CHAR].x = CHAR_INITIAL_POS_X;
     sprites[SPRITE_CHAR].y = CHAR_INITIAL_POS_Y;
+    sprites[SPRITE_CHAR].frame_delay = 200;
+    sprites[SPRITE_CHAR].frame_delay_current = 0;
 
     sprites[TILESET_IMG] = read_png_file("./tilesets/tileset.png");
 }
 
 GLubyte * get_sprite_frame_image(Sprite sprite)
 {
+    sprite.frame_delay_current += 1;
+    if (sprite.frame_delay_current > sprite.frame_delay) {
+        sprite.frame_current = sprite.frame_current + 1;
+        if (sprite.frame_current > sprite.frame_end) {
+            sprite.frame_current = sprite.frame_start;
+        }
+        sprite.frame_delay_current = 0;
+    }
+    
+    printf("\r\nFRAME: %i, %i, %i", sprite.frame_current, sprite.frame_start, sprite.frame_end);
+    sprites[SPRITE_CHAR] = sprite;
     unsigned int frame_row_bytes = sizeof(png_bytep);
     int frame_total_bytes = frame_row_bytes * sprite.frame_width * sprite.height;
     GLubyte * ret = malloc(frame_total_bytes);
@@ -112,7 +128,7 @@ GLubyte * get_sprite_frame_image(Sprite sprite)
                                   (sprite.width * (sprite.frame_current-1) * frame_row_bytes) + // Jump to frame pixels
                                   (i * sprite.width * frame_row_bytes); // Jump to current line;
 
-        printf("\r\nCopying to:%i from:%i", row_pointer, frame_pointer);
+        // printf("\r\nCopying to:%i from:%i", row_pointer, frame_pointer);
         memcpy(row_pointer,
                frame_pointer, 
                sprite.frame_width * frame_row_bytes);
@@ -185,7 +201,7 @@ GLubyte * mount_scene()
 
     // ADD ACTORS IMAGE TO SCENE
     for (int i=0; i<actors_count; i++) {
-        printf("%i actor", i);
+        // printf("%i actor", i);
         GLubyte * actor_frame = get_sprite_frame_image(scene_actors[i]);
         add_to_scene(
             scene, 

@@ -51,9 +51,10 @@ Draw(void)
         // glTexImage2D(GL_TEXTURE_2D, 0, 4, sprites[1].frame_width,
         //                 sprites[1].height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
         //                 get_sprite_frame_image(sprites[1]));
+        GLubyte * scene = mount_scene();
         glTexImage2D(GL_TEXTURE_2D, 0, 4, SCREEN_WIDTH,
                         SCREEN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                        mount_scene());
+                        scene);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);                        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -69,11 +70,9 @@ Draw(void)
 
         glDisable(GL_TEXTURE_2D);
 
-        if (doubleBuffer) {
-                glutSwapBuffers();
-        } else {
-                glFlush();
-        }
+        glFlush();
+
+        free(scene);
 }
 
 void myReshape(int w, int h) {
@@ -100,6 +99,7 @@ main(int argc, char **argv)
 
         glutReshapeFunc(myReshape);
         glutDisplayFunc(Draw); 
+        glutIdleFunc(Draw);
         glutMainLoop();
 
         return 0; 

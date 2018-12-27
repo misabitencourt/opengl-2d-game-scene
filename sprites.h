@@ -12,6 +12,9 @@ const int MAX_SPRITES = 100;
 const int CHAR_INITIAL_POS_X = 20;
 const int CHAR_INITIAL_POS_Y = 45;
 
+const int CHAR_ANIMATION_WALKING_DOWN = 0;
+const int CHAR_ANIMATION_WALKING_DOWN_START = 1;
+const int CHAR_ANIMATION_WALKING_DOWN_END = 3;
 
 typedef struct {
     int x;
@@ -21,7 +24,11 @@ typedef struct {
     int height;
     int frame_width;
     int frame_current;
+    int frame_start;
+    int frame_end;
     int frame_delay;
+    int frame_delay_current;
+    int animation;
     unsigned int row_bytes;
     GLubyte * image;
     GLuint texture;
