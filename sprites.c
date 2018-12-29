@@ -248,6 +248,7 @@ GLubyte * mount_scene()
             scene_actors[i].frame_width,
             scene_actors[i].height
         );
+        free(actor_frame);
     }
 
     return scene;
