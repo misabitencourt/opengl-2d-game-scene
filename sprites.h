@@ -16,6 +16,10 @@ const int CHAR_ANIMATION_WALKING_DOWN = 0;
 const int CHAR_ANIMATION_WALKING_DOWN_START = 1;
 const int CHAR_ANIMATION_WALKING_DOWN_END = 3;
 
+const int TRANSPARENT_COLOR_RED = 255;
+const int TRANSPARENT_COLOR_GREEN = 0;
+const int TRANSPARENT_COLOR_BLUE = 255;
+
 typedef struct {
     int x;
     int y;

@@ -186,7 +186,17 @@ void add_to_scene(GLubyte * scene, GLubyte * sprite_frame, int x, int y, int w, 
                                  (printed_lines * SCREEN_WIDTH * frame_row_bytes) + 
                                  (x * frame_row_bytes);
         GLubyte * src = sprite_frame + (frame_row_bytes * printed_lines * w);
-        memcpy(dest, src, w * frame_row_bytes);
+        for (int i=0; i<w; i++) {
+            int red = *(src+(i*frame_row_bytes));
+            int green = *(src+(i*frame_row_bytes)+1);
+            int blue = *(src+(i*frame_row_bytes)+2);
+            if (red == TRANSPARENT_COLOR_RED &&
+                green == TRANSPARENT_COLOR_GREEN &&
+                blue == TRANSPARENT_COLOR_BLUE) {
+                continue;
+            }
+            memcpy(dest+(i*frame_row_bytes), src+(i*frame_row_bytes), frame_row_bytes);
+        }
         printed_lines += 1;
     }
 }
@@ -229,7 +239,6 @@ GLubyte * mount_scene()
 
     // ADD ACTORS IMAGE TO SCENE
     for (int i=0; i<actors_count; i++) {
-        // printf("%i actor", i);
         GLubyte * actor_frame = get_sprite_frame_image(scene_actors[i]);
         add_to_scene(
             scene, 
