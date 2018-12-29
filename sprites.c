@@ -127,7 +127,7 @@ GLubyte * get_sprite_frame_image(Sprite sprite)
     for (int i=0; i<sprite.height; i++) {
         GLubyte * row_pointer = ret + frame_total_bytes - (frame_row_bytes * (sprite.height-i) * sprite.frame_width);
         GLubyte * frame_pointer = sprite.image + // Sprite first pixel pointer
-                                  (sprite.width * (sprite.frame_current-1) * frame_row_bytes) + // Jump to frame pixels
+                                  (sprite.frame_width * (sprite.frame_current-1) * frame_row_bytes) + // Jump to frame pixels
                                   (i * sprite.width * frame_row_bytes); // Jump to current line;
 
         // printf("\r\nCopying to:%i from:%i", row_pointer, frame_pointer);
@@ -207,12 +207,36 @@ void controls()
 
     if (game_state.up) {
         sprite_char.y += 1;
+        if (sprite_char.animation != CHAR_ANIMATION_WALKING_UP) {
+            sprite_char.frame_current = CHAR_ANIMATION_WALKING_UP_START;
+        }
+        sprite_char.animation = CHAR_ANIMATION_WALKING_UP;
+        sprite_char.frame_start = CHAR_ANIMATION_WALKING_UP_START;
+        sprite_char.frame_end = CHAR_ANIMATION_WALKING_UP_END;
     } else if (game_state.down) {
         sprite_char.y -= 1;
+        if (sprite_char.animation != CHAR_ANIMATION_WALKING_DOWN) {
+            sprite_char.frame_current = CHAR_ANIMATION_WALKING_DOWN_START;
+        }
+        sprite_char.animation = CHAR_ANIMATION_WALKING_DOWN;
+        sprite_char.frame_start = CHAR_ANIMATION_WALKING_DOWN_START;
+        sprite_char.frame_end = CHAR_ANIMATION_WALKING_DOWN_END;
     } else if (game_state.left) {
         sprite_char.x -= 1;
+        if (sprite_char.animation != CHAR_ANIMATION_WALKING_LEFT) {
+            sprite_char.frame_current = CHAR_ANIMATION_WALKING_LEFT_START;
+        }
+        sprite_char.animation = CHAR_ANIMATION_WALKING_LEFT;
+        sprite_char.frame_start = CHAR_ANIMATION_WALKING_LEFT_START;
+        sprite_char.frame_end = CHAR_ANIMATION_WALKING_LEFT_END;
     } else if (game_state.right) {
         sprite_char.x += 1;
+        if (sprite_char.animation != CHAR_ANIMATION_WALKING_RIGHT) {
+            sprite_char.frame_current = CHAR_ANIMATION_WALKING_RIGHT_START;
+        }
+        sprite_char.animation = CHAR_ANIMATION_WALKING_RIGHT;
+        sprite_char.frame_start = CHAR_ANIMATION_WALKING_RIGHT_START;
+        sprite_char.frame_end = CHAR_ANIMATION_WALKING_RIGHT_END;
     }
 
     sprite_char.x = sprite_char.x < 0 ? 0 : sprite_char.x;
