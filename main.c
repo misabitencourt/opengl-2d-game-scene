@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <png.h>
+#include "maps.h"
 #include "state.h"
 #include "sprites.h"
 #include "sprites.c"
@@ -24,34 +25,10 @@ Draw(void)
         glRotatef(0, 1,0,0);
         glClearColor(0.0, 0.0, 0.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT);
-        // glColor3f(0.0, 1.0, 0.0);        
 
         glEnable(GL_TEXTURE_2D);
 
-        // for (i=0; i<sizeof(sprites); i++) {
-        //         if (sprites[i].loaded == 1) {    
-        //                 printf("width: %d\r\n", sprites[i].width);
-        //                 printf("height: %d\r\n", sprites[i].height);
-        //                 printf("data: %d\r\n", sprites[i].image);
-        //                 glGenTextures(1, &sprites[i].texture);
-        //                 glBindTexture(GL_TEXTURE_2D, sprites[i].texture);
-        //                 glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        //                 glTexImage2D(GL_TEXTURE_2D, 0, 4, sprites[i].width,
-        //                                 sprites[i].height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-        //                                 sprites[i].image);
-        //                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
-        //                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);                        
-        //                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        //                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        //                 float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-        //                 glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-        //         }
-        // } 
-
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        // glTexImage2D(GL_TEXTURE_2D, 0, 4, sprites[1].frame_width,
-        //                 sprites[1].height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-        //                 get_sprite_frame_image(sprites[1]));
         GLubyte * scene = mount_scene();
         glTexImage2D(GL_TEXTURE_2D, 0, 4, SCREEN_WIDTH,
                         SCREEN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE,
