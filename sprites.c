@@ -1,5 +1,7 @@
 State game_state;
-Sprite sprites[10];
+Sprite sprite_char;
+Sprite tree_img;
+Sprite tileset_img;
 
  Sprite read_png_file(char * file_name) 
  {
@@ -91,19 +93,21 @@ Sprite sprites[10];
 
 void load_sprites()
 {   
-    sprites[SPRITE_CHAR] = read_png_file("./sprites/char.png");
-    sprites[SPRITE_CHAR].frame_width = 32;
-    sprites[SPRITE_CHAR].frame_current = 1;
-    sprites[SPRITE_CHAR].animation = CHAR_ANIMATION_WALKING_DOWN;
-    sprites[SPRITE_CHAR].frame_start = CHAR_ANIMATION_WALKING_DOWN_START;
-    sprites[SPRITE_CHAR].frame_end = CHAR_ANIMATION_WALKING_DOWN_END;
-    sprites[SPRITE_CHAR].frame_delay = 0;
-    sprites[SPRITE_CHAR].x = CHAR_INITIAL_POS_X;
-    sprites[SPRITE_CHAR].y = CHAR_INITIAL_POS_Y;
-    sprites[SPRITE_CHAR].frame_delay = 50;
-    sprites[SPRITE_CHAR].frame_delay_current = 0;
+    sprite_char = read_png_file("./sprites/char.png");
+    sprite_char.frame_width = 32;
+    sprite_char.frame_current = 1;
+    sprite_char.animation = CHAR_ANIMATION_WALKING_DOWN;
+    sprite_char.frame_start = CHAR_ANIMATION_WALKING_DOWN_START;
+    sprite_char.frame_end = CHAR_ANIMATION_WALKING_DOWN_END;
+    sprite_char.frame_delay = 0;
+    sprite_char.x = CHAR_INITIAL_POS_X;
+    sprite_char.y = CHAR_INITIAL_POS_Y;
+    sprite_char.frame_delay = 50;
+    sprite_char.frame_delay_current = 0;
 
-    sprites[TILESET_IMG] = read_png_file("./tilesets/tileset.png");
+    tileset_img = read_png_file("./tilesets/tileset.png");
+
+    tree_img = read_png_file("./sprites/tree.png");
 }
 
 GLubyte * get_sprite_frame_image(Sprite sprite)
@@ -118,8 +122,6 @@ GLubyte * get_sprite_frame_image(Sprite sprite)
         sprite.frame_delay_current = 0;
     }
     
-    // printf("\r\nFRAME: %i, %i, %i", sprite.frame_current, sprite.frame_start, sprite.frame_end);
-    sprites[SPRITE_CHAR] = sprite;
     unsigned int frame_row_bytes = sizeof(png_bytep);
     int frame_total_bytes = frame_row_bytes * sprite.frame_width * sprite.height;
     GLubyte * ret = malloc(frame_total_bytes);
@@ -130,7 +132,6 @@ GLubyte * get_sprite_frame_image(Sprite sprite)
                                   (sprite.frame_width * (sprite.frame_current-1) * frame_row_bytes) + // Jump to frame pixels
                                   (i * sprite.width * frame_row_bytes); // Jump to current line;
 
-        // printf("\r\nCopying to:%i from:%i", row_pointer, frame_pointer);
         memcpy(row_pointer,
                frame_pointer, 
                sprite.frame_width * frame_row_bytes);
@@ -144,7 +145,7 @@ GLubyte * mount_bkg_tileset()
     unsigned int frame_row_bytes = sizeof(png_bytep);
     const int to_paint_bytes = frame_row_bytes * TILESET_SIZE * TILESET_SIZE;
     GLubyte * to_paint = malloc(to_paint_bytes);
-    Sprite tileset = sprites[TILESET_IMG];
+    Sprite tileset = tileset_img;
     GLubyte * frame_pointer = tileset.image;
     memcpy(to_paint, tileset.image, to_paint_bytes);
     const int scene_end = frame_row_bytes * SCREEN_WIDTH * SCREEN_HEIGHT;
@@ -203,8 +204,6 @@ void add_to_scene(GLubyte * scene, GLubyte * sprite_frame, int x, int y, int w, 
 
 void controls()
 {
-    Sprite sprite_char = sprites[SPRITE_CHAR];
-
     if (game_state.up) {
         sprite_char.y += 1;
         if (sprite_char.animation != CHAR_ANIMATION_WALKING_UP) {
@@ -244,8 +243,6 @@ void controls()
     
     sprite_char.x = sprite_char.x > SCREEN_WIDTH ? SCREEN_WIDTH : sprite_char.x;
     sprite_char.y = sprite_char.y > SCREEN_HEIGHT ? SCREEN_HEIGHT : sprite_char.y;
-
-    sprites[SPRITE_CHAR] = sprite_char;
 }
 
 GLubyte * mount_scene()
@@ -257,22 +254,46 @@ GLubyte * mount_scene()
     controls();
 
     // LIST ACTORS
-    const int actors_count = 1;
-    Sprite scene_actors[actors_count];
-    scene_actors[0] = sprites[SPRITE_CHAR];
+    GLubyte * sprite_char_frame = get_sprite_frame_image(sprite_char);
+    add_to_scene(
+        scene, 
+        sprite_char_frame, 
+        sprite_char.x, 
+        sprite_char.y, 
+        sprite_char.frame_width,
+        sprite_char.height
+    );
+    free(sprite_char_frame);
 
-    // ADD ACTORS IMAGE TO SCENE
-    for (int i=0; i<actors_count; i++) {
-        GLubyte * actor_frame = get_sprite_frame_image(scene_actors[i]);
+    // MAP OBSTACLES
+    for (int i=0; i<MAPS_LEVEL_OBSTACLES_LENGTH; i++) {
+        Sprite current_obstacle;
+        int current_obstacle_data_type = MAPS_LEVEL_OBSTACLES[i][0];
+        int current_obstacle_data_x = MAPS_LEVEL_OBSTACLES[i][1];
+        int current_obstacle_data_y = MAPS_LEVEL_OBSTACLES[i][2];
+        if (current_obstacle_data_type == SPRITE_TREE) {
+            current_obstacle.width = tree_img.width;
+            current_obstacle.height = tree_img.height;
+            current_obstacle.frame_width = tree_img.width;
+            current_obstacle.frame_current = 1;
+            current_obstacle.frame_start = 1;
+            current_obstacle.frame_end = 1;
+            current_obstacle.frame_delay = 1;
+            current_obstacle.image = tree_img.image;
+        }
+        current_obstacle.x = current_obstacle_data_x;
+        current_obstacle.y = current_obstacle_data_y;
+        current_obstacle.loaded = 1;
+        GLubyte * obstacle_frame = get_sprite_frame_image(current_obstacle);
         add_to_scene(
             scene, 
-            actor_frame, 
-            scene_actors[i].x, 
-            scene_actors[i].y, 
-            scene_actors[i].frame_width,
-            scene_actors[i].height
+            obstacle_frame, 
+            current_obstacle.x, 
+            current_obstacle.y, 
+            current_obstacle.frame_width,
+            current_obstacle.height
         );
-        free(actor_frame);
+        free(obstacle_frame);
     }
 
     return scene;

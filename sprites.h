@@ -7,6 +7,7 @@ const int TILESET_BACKGROUND_Y = 0;
 
 const int TILESET_IMG = 0;
 const int SPRITE_CHAR = 1;
+const int SPRITE_TREE = 2;
 const int MAX_SPRITES = 100;
 
 const int CHAR_INITIAL_POS_X = 20;

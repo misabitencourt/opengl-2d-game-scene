@@ -106,7 +106,6 @@ main(int argc, char **argv)
         glutCreateWindow("square");
 
         glMatrixMode(GL_PROJECTION);
-        // glOrtho(0.0, 10.0, 0.0, 10.0, -1.0, 1.0);
 
         glutKeyboardFunc(keyPressed);
         glutKeyboardUpFunc(keyUp); 
