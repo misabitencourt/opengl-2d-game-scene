@@ -95,15 +95,14 @@ void load_sprites()
 {   
     sprite_char = read_png_file("./sprites/char.png");
     sprite_char.frame_width = 32;
-    sprite_char.frame_current = 1;
     sprite_char.animation = CHAR_ANIMATION_WALKING_DOWN;
+    sprite_char.frame_current = CHAR_ANIMATION_WALKING_DOWN_START;
     sprite_char.frame_start = CHAR_ANIMATION_WALKING_DOWN_START;
     sprite_char.frame_end = CHAR_ANIMATION_WALKING_DOWN_END;
-    sprite_char.frame_delay = 0;
     sprite_char.x = CHAR_INITIAL_POS_X;
     sprite_char.y = CHAR_INITIAL_POS_Y;
     sprite_char.frame_delay = 50;
-    sprite_char.frame_delay_current = 0;
+    sprite_char.frame_delay_current = 1;
 
     tileset_img = read_png_file("./tilesets/tileset.png");
 
@@ -111,17 +110,7 @@ void load_sprites()
 }
 
 GLubyte * get_sprite_frame_image(Sprite sprite)
-{
-    // Frame update
-    sprite.frame_delay_current += 1;
-    if (sprite.frame_delay_current > sprite.frame_delay) {
-        sprite.frame_current = sprite.frame_current + 1;
-        if (sprite.frame_current > sprite.frame_end) {
-            sprite.frame_current = sprite.frame_start;
-        }
-        sprite.frame_delay_current = 0;
-    }
-    
+{   
     unsigned int frame_row_bytes = sizeof(png_bytep);
     int frame_total_bytes = frame_row_bytes * sprite.frame_width * sprite.height;
     GLubyte * ret = malloc(frame_total_bytes);
@@ -241,8 +230,23 @@ void controls()
     sprite_char.x = sprite_char.x < 0 ? 0 : sprite_char.x;
     sprite_char.y = sprite_char.y < 0 ? 0 : sprite_char.y;
     
-    sprite_char.x = sprite_char.x > SCREEN_WIDTH ? SCREEN_WIDTH : sprite_char.x;
-    sprite_char.y = sprite_char.y > SCREEN_HEIGHT ? SCREEN_HEIGHT : sprite_char.y;
+    sprite_char.x = sprite_char.x > (SCREEN_WIDTH-SCREEN_LIMIT) ? (SCREEN_WIDTH-SCREEN_LIMIT) : sprite_char.x;
+    sprite_char.y = sprite_char.y > (SCREEN_HEIGHT-SCREEN_LIMIT) ? (SCREEN_HEIGHT-SCREEN_LIMIT) : sprite_char.y;
+}
+
+Sprite update_frame(Sprite sprite)
+{
+    // Frame update
+    sprite.frame_delay_current += 1;
+    if (sprite.frame_delay_current > sprite.frame_delay) {
+        sprite.frame_current = sprite.frame_current + 1;
+        if (sprite.frame_current > sprite.frame_end) {
+            sprite.frame_current = sprite.frame_start;
+        }
+        sprite.frame_delay_current = 0;
+    }
+
+    return sprite;
 }
 
 GLubyte * mount_scene()
@@ -254,6 +258,7 @@ GLubyte * mount_scene()
     controls();
 
     // LIST ACTORS
+    sprite_char = update_frame(sprite_char);
     GLubyte * sprite_char_frame = get_sprite_frame_image(sprite_char);
     add_to_scene(
         scene, 

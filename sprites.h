@@ -1,5 +1,6 @@
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 800;
+const int SCREEN_LIMIT = 50;
 
 const int TILESET_SIZE = 32;
 const int TILESET_BACKGROUND_X = 0;
