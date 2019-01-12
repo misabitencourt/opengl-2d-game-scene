@@ -191,10 +191,37 @@ void add_to_scene(GLubyte * scene, GLubyte * sprite_frame, int x, int y, int w, 
     }
 }
 
+int check_char_obstacle_collision()
+{
+    for (int i=0; i<MAPS_LEVEL_OBSTACLES_LENGTH; i++) {
+        int obstacle_w, obstacle_h;
+        if (MAPS_LEVEL_OBSTACLES[i][0] == SPRITE_TREE) {
+            obstacle_w = tree_img.width;
+            obstacle_h = tree_img.height;
+        }
+        if (collision(
+            sprite_char.x, 
+            MAPS_LEVEL_OBSTACLES[i][1],
+            sprite_char.y,
+            MAPS_LEVEL_OBSTACLES[i][2],
+            sprite_char.frame_width,
+            obstacle_w,
+            sprite_char.height,
+            obstacle_h
+        )) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void controls()
 {
     if (game_state.up) {
         sprite_char.y += 1;
+        if (check_char_obstacle_collision()) {
+            sprite_char.y -= 1;
+        }
         if (sprite_char.animation != CHAR_ANIMATION_WALKING_UP) {
             sprite_char.frame_current = CHAR_ANIMATION_WALKING_UP_START;
         }
@@ -203,6 +230,9 @@ void controls()
         sprite_char.frame_end = CHAR_ANIMATION_WALKING_UP_END;
     } else if (game_state.down) {
         sprite_char.y -= 1;
+        if (check_char_obstacle_collision()) {
+            sprite_char.y += 1;
+        }
         if (sprite_char.animation != CHAR_ANIMATION_WALKING_DOWN) {
             sprite_char.frame_current = CHAR_ANIMATION_WALKING_DOWN_START;
         }
@@ -211,6 +241,9 @@ void controls()
         sprite_char.frame_end = CHAR_ANIMATION_WALKING_DOWN_END;
     } else if (game_state.left) {
         sprite_char.x -= 1;
+        if (check_char_obstacle_collision()) {
+            sprite_char.x += 1;
+        }
         if (sprite_char.animation != CHAR_ANIMATION_WALKING_LEFT) {
             sprite_char.frame_current = CHAR_ANIMATION_WALKING_LEFT_START;
         }
@@ -219,6 +252,9 @@ void controls()
         sprite_char.frame_end = CHAR_ANIMATION_WALKING_LEFT_END;
     } else if (game_state.right) {
         sprite_char.x += 1;
+        if (check_char_obstacle_collision()) {
+            sprite_char.x -= 1;
+        }
         if (sprite_char.animation != CHAR_ANIMATION_WALKING_RIGHT) {
             sprite_char.frame_current = CHAR_ANIMATION_WALKING_RIGHT_START;
         }

@@ -9,6 +9,7 @@
 #include "maps.h"
 #include "state.h"
 #include "sprites.h"
+#include "utils.c"
 #include "sprites.c"
 
 Scene scene;
