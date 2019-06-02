@@ -1,6 +1,7 @@
 State game_state;
 Sprite sprite_char;
 Sprite tree_img;
+Sprite stone_img;
 Sprite tileset_img;
 
  Sprite read_png_file(char * file_name) 
@@ -105,8 +106,8 @@ void load_sprites()
     sprite_char.frame_delay_current = 1;
 
     tileset_img = read_png_file("./tilesets/tileset.png");
-
     tree_img = read_png_file("./sprites/tree.png");
+    stone_img = read_png_file("./sprites/stone.png");
 }
 
 GLubyte * get_sprite_frame_image(Sprite sprite)
@@ -198,6 +199,10 @@ int check_char_obstacle_collision()
         if (MAPS_LEVEL_OBSTACLES[i][0] == SPRITE_TREE) {
             obstacle_w = tree_img.width;
             obstacle_h = tree_img.height;
+        }
+        if (MAPS_LEVEL_OBSTACLES[i][0] == SPRITE_STONE) {
+            obstacle_w = stone_img.width;
+            obstacle_h = stone_img.height;
         }
         if (collision(
             sprite_char.x, 
@@ -321,6 +326,15 @@ GLubyte * mount_scene()
             current_obstacle.frame_end = 1;
             current_obstacle.frame_delay = 1;
             current_obstacle.image = tree_img.image;
+        } else if (current_obstacle_data_type == SPRITE_STONE) {
+            current_obstacle.width = stone_img.width;
+            current_obstacle.height = stone_img.height;
+            current_obstacle.frame_width = stone_img.width;
+            current_obstacle.frame_current = 1;
+            current_obstacle.frame_start = 1;
+            current_obstacle.frame_end = 1;
+            current_obstacle.frame_delay = 1;
+            current_obstacle.image = stone_img.image;
         }
         current_obstacle.x = current_obstacle_data_x;
         current_obstacle.y = current_obstacle_data_y;
