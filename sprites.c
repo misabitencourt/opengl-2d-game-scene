@@ -3,6 +3,7 @@ Sprite sprite_char;
 Sprite tree_img;
 Sprite stone_img;
 Sprite tileset_img;
+Sprite font_img;
 
  Sprite read_png_file(char * file_name) 
  {
@@ -75,7 +76,7 @@ Sprite tileset_img;
 
     png_read_image(png_ptr, row_pointers);
 
-    for (int i = 0; i < height; i++) {
+    for (int i = 0; i < height; i++) {        
         memcpy(ret.image+(row_bytes * (height-1-i)), row_pointers[i], row_bytes);
     }
 
@@ -108,6 +109,7 @@ void load_sprites()
     tileset_img = read_png_file("./tilesets/tileset.png");
     tree_img = read_png_file("./sprites/tree.png");
     stone_img = read_png_file("./sprites/stone.png");
+    font_img = read_png_file("./sprites/font.png");
 }
 
 GLubyte * get_sprite_frame_image(Sprite sprite)
@@ -350,6 +352,19 @@ GLubyte * mount_scene()
         );
         free(obstacle_frame);
     }
+
+    char * text = "Hello world";
+    GLubyte * hello_text = get_text_image_line(font_img, text);
+    if (hello_text != NULL) {
+        add_to_scene(
+            scene, 
+            hello_text, 
+            10,
+            10, 
+            get_str_length(text) * FONT_FRAME_WIDTH,
+            font_img.height
+        );
+    }    
 
     return scene;
 }
