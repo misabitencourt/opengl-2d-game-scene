@@ -31,10 +31,10 @@ Draw(void)
         glEnable(GL_TEXTURE_2D);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        GLubyte * scene = mount_scene();
+        mount_scene();
         glTexImage2D(GL_TEXTURE_2D, 0, 4, SCREEN_WIDTH,
                         SCREEN_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                        scene);
+                        current_frame);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);                        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -51,7 +51,6 @@ Draw(void)
         glDisable(GL_TEXTURE_2D);
         glutSwapBuffers();
         glFlush();
-        free(scene);
 }
 
 void myReshape(int w, int h) {

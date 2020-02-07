@@ -4,6 +4,8 @@ Sprite tree_img;
 Sprite stone_img;
 Sprite tileset_img;
 Sprite font_img;
+void * current_frame;
+unsigned int starting = 1;
 
  Sprite read_png_file(char * file_name) 
  {
@@ -112,15 +114,15 @@ void load_sprites()
     font_img = read_png_file("./sprites/font.png");
 }
 
-GLubyte * get_sprite_frame_image(Sprite sprite)
+void * get_sprite_frame_image(Sprite sprite)
 {   
-    unsigned int frame_row_bytes = sizeof(png_bytep);
+    unsigned int frame_row_bytes = 4;
     int frame_total_bytes = frame_row_bytes * sprite.frame_width * sprite.height;
-    GLubyte * ret = malloc(frame_total_bytes);
+    void * ret = malloc(frame_total_bytes);
 
     for (int i=0; i<sprite.height; i++) {
-        GLubyte * row_pointer = ret + frame_total_bytes - (frame_row_bytes * (sprite.height-i) * sprite.frame_width);
-        GLubyte * frame_pointer = sprite.image + // Sprite first pixel pointer
+        void * row_pointer = ret + frame_total_bytes - (frame_row_bytes * (sprite.height-i) * sprite.frame_width);
+        void * frame_pointer = sprite.image + // Sprite first pixel pointer
                                   (sprite.frame_width * (sprite.frame_current-1) * frame_row_bytes) + // Jump to frame pixels
                                   (i * sprite.width * frame_row_bytes); // Jump to current line;
 
@@ -132,26 +134,30 @@ GLubyte * get_sprite_frame_image(Sprite sprite)
     return ret;
 }
 
-GLubyte * mount_bkg_tileset()
+void mount_bkg_tileset()
 {
-    unsigned int frame_row_bytes = sizeof(png_bytep);
-    const int to_paint_bytes = frame_row_bytes * TILESET_SIZE * TILESET_SIZE;
-    GLubyte * to_paint = malloc(to_paint_bytes);
+    unsigned int frame_row_bytes = 4;
+    const int to_paint_bytes = 4 * TILESET_SIZE * TILESET_SIZE;
+    void * to_paint = malloc(to_paint_bytes);
     Sprite tileset = tileset_img;
-    GLubyte * frame_pointer = tileset.image;
+    void * frame_pointer = tileset.image;
     memcpy(to_paint, tileset.image, to_paint_bytes);
-    const int scene_end = frame_row_bytes * SCREEN_WIDTH * SCREEN_HEIGHT;
-    GLubyte * scene = malloc(scene_end);
+    const unsigned int scene_end = frame_row_bytes * SCREEN_WIDTH * SCREEN_HEIGHT;
+    if (!starting) {
+        free(current_frame);
+    }
+    current_frame = malloc(scene_end);
     int current_tileset_line = 0;
     int w_bkg_painted = 0;
     int h_bkg_painted = 0;
 
     // BACKGROUND
-    while (h_bkg_painted <= SCREEN_HEIGHT) {
-        while (w_bkg_painted <= SCREEN_WIDTH) {
-            GLubyte * dest = scene + (h_bkg_painted * SCREEN_WIDTH * frame_row_bytes) + 
+    unsigned int padding = 100;
+    while (h_bkg_painted <= (SCREEN_HEIGHT - padding)) {
+        while (w_bkg_painted <= (SCREEN_WIDTH - padding)) {
+            void * dest = current_frame + (h_bkg_painted * SCREEN_WIDTH * frame_row_bytes) + 
                                      (w_bkg_painted * frame_row_bytes);
-            GLubyte * src = to_paint + (current_tileset_line * TILESET_SIZE * frame_row_bytes);
+            void * src = to_paint + (current_tileset_line * TILESET_SIZE * frame_row_bytes);
             memcpy(dest, src, frame_row_bytes * TILESET_SIZE);
             w_bkg_painted += TILESET_SIZE;
         }
@@ -162,32 +168,34 @@ GLubyte * mount_bkg_tileset()
     }
 
     free(to_paint);
-
-    return scene;
 }
 
-void add_to_scene(GLubyte * scene, GLubyte * sprite_frame, int x, int y, int w, int h)
+void add_to_scene(void * scene, void * sprite_frame, int x, int y, int w, int h)
 {
-    unsigned int frame_row_bytes = sizeof(png_bytep);
+    unsigned int frame_row_bytes = 4;
     int printed_lines = 0;
 
     w = ((x + w) > SCREEN_WIDTH) ? ((w + x) - SCREEN_WIDTH) : w;
     h = ((y + h) > SCREEN_HEIGHT) ? ((y + h) - SCREEN_HEIGHT) : h;
 
     while (printed_lines != h) {
-        GLubyte * dest = scene + (y * SCREEN_WIDTH * frame_row_bytes) + 
-                                 (printed_lines * SCREEN_WIDTH * frame_row_bytes) + 
-                                 (x * frame_row_bytes);
-        GLubyte * src = sprite_frame + (frame_row_bytes * printed_lines * w);
+        void * dest = scene + (y * SCREEN_WIDTH * frame_row_bytes) + 
+                              (printed_lines * SCREEN_WIDTH * frame_row_bytes) + 
+                              (x * frame_row_bytes);
+        void * src = sprite_frame + (frame_row_bytes * printed_lines * w);                
         for (int i=0; i<w; i++) {
-            int red = *(src+(i*frame_row_bytes));
-            int green = *(src+(i*frame_row_bytes)+1);
-            int blue = *(src+(i*frame_row_bytes)+2);
-            if (red == TRANSPARENT_COLOR_RED &&
-                green == TRANSPARENT_COLOR_GREEN &&
-                blue == TRANSPARENT_COLOR_BLUE) {
-                continue;
-            }
+            // int * redP = (src+(i*frame_row_bytes));
+            // int * greenP = (src+(i*frame_row_bytes)+4);
+            // int * blueP = (src+(i*frame_row_bytes)+8);
+            // int red = ((*redP) / 256) * -1;
+            // int blue = ((*blueP) / 256) * -1;
+            // int green = ((*greenP) / 256) * -1;
+            // if (red == TRANSPARENT_COLOR_RED &&
+            //     green == TRANSPARENT_COLOR_GREEN &&
+            //     blue == TRANSPARENT_COLOR_BLUE) {
+            //     printf("TRANSPARENT >>> \n\n");
+            //     continue;
+            // }
             memcpy(dest+(i*frame_row_bytes), src+(i*frame_row_bytes), frame_row_bytes);
         }
         printed_lines += 1;
@@ -292,19 +300,20 @@ Sprite update_frame(Sprite sprite)
     return sprite;
 }
 
-GLubyte * mount_scene()
-{
-    // CREATE BACKGROUND
-    GLubyte * scene = mount_bkg_tileset();
+void mount_scene()
+{    
+    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;
 
+    // CREATE BACKGROUND
+    mount_bkg_tileset();    
     // Controls
     controls();
 
     // LIST ACTORS
     sprite_char = update_frame(sprite_char);
-    GLubyte * sprite_char_frame = get_sprite_frame_image(sprite_char);
+    void * sprite_char_frame = get_sprite_frame_image(sprite_char);
     add_to_scene(
-        scene, 
+        current_frame, 
         sprite_char_frame, 
         sprite_char.x, 
         sprite_char.y, 
@@ -341,9 +350,9 @@ GLubyte * mount_scene()
         current_obstacle.x = current_obstacle_data_x;
         current_obstacle.y = current_obstacle_data_y;
         current_obstacle.loaded = 1;
-        GLubyte * obstacle_frame = get_sprite_frame_image(current_obstacle);
+        void * obstacle_frame = get_sprite_frame_image(current_obstacle);
         add_to_scene(
-            scene, 
+            current_frame, 
             obstacle_frame, 
             current_obstacle.x, 
             current_obstacle.y, 
@@ -353,18 +362,20 @@ GLubyte * mount_scene()
         free(obstacle_frame);
     }
 
-    char * text = "Hello world";
-    GLubyte * hello_text = get_text_image_line(font_img, text);
-    if (hello_text != NULL) {
+    char * text = "0001";
+    void * points_text = get_text_image_line(font_img, text);
+    if (points_text != NULL) {
         add_to_scene(
-            scene, 
-            hello_text, 
-            10,
+            current_frame, 
+            points_text, 
+            500,
             10, 
             get_str_length(text) * FONT_FRAME_WIDTH,
             font_img.height
         );
     }    
 
-    return scene;
+    if (starting) {
+        starting = 0;
+    }
 }

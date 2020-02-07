@@ -56,7 +56,7 @@ typedef struct {
     int frame_delay_current;
     int animation;
     unsigned int row_bytes;
-    GLubyte * image;
+    void * image;
     GLuint texture;
 } Sprite;
 
@@ -68,11 +68,11 @@ typedef struct {
     int tile_y;
     int tile_width;
     int tile_height;
-    GLubyte * image;
+    void * image;
 } Tileset;
 
 typedef struct {
     int width;
     int height;
-    GLubyte * image;
+    void * image;
 } Scene;

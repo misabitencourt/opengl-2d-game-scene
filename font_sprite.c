@@ -50,12 +50,12 @@ int get_str_length(char * text)
     return char_count-1;
 }
 
-GLubyte * get_text_image_line(Sprite font, char * text)
+void * get_text_image_line(Sprite font, char * text)
 {
     unsigned int text_length = 0;    
     int char_count = get_str_length(text);
 
-    unsigned int frame_row_bytes = sizeof(png_bytep);    
+    unsigned int frame_row_bytes = 4;
     int frame_total_bytes = frame_row_bytes * FONT_FRAME_WIDTH * font.height * char_count;
     int single_char_bytes = frame_row_bytes * FONT_FRAME_WIDTH * font.height;
     if (frame_total_bytes <= 0)
@@ -63,7 +63,7 @@ GLubyte * get_text_image_line(Sprite font, char * text)
         return NULL;
     }
 
-    GLubyte * ret = malloc(frame_total_bytes);
+    void * ret = malloc(frame_total_bytes);
     for (int i=0; i<char_count; i++) 
     {
         char current_char = str_char_at(text, i);
@@ -73,21 +73,21 @@ GLubyte * get_text_image_line(Sprite font, char * text)
             continue;
         }
         for (int j=0; j<font.height; j++) {
-            GLubyte * dest = ret + (
+            void * dest = ret + (
                 frame_row_bytes * j * FONT_FRAME_WIDTH * char_count
             ) + (
                 frame_row_bytes * i * FONT_FRAME_WIDTH
             );
             if (current_char == ' ') {
                 for (int k=0; k<FONT_FRAME_WIDTH; k++) {
-                    GLubyte * pixel_pointer = dest + (k * frame_row_bytes);
+                    void * pixel_pointer = dest + (k * frame_row_bytes);
                     memcpy(pixel_pointer, &TRANSPARENT_COLOR_RED, 1);
                     memcpy(pixel_pointer+1, &TRANSPARENT_COLOR_GREEN, 1);
                     memcpy(pixel_pointer+2, &TRANSPARENT_COLOR_BLUE, 1);
                 }                
                 continue;
             }            
-            GLubyte * src = font.image + (j * font.width * frame_row_bytes) +
+            void * src = font.image + (j * font.width * frame_row_bytes) +
                                          (char_index * FONT_FRAME_WIDTH * frame_row_bytes);
             memcpy(dest, src, frame_row_bytes * FONT_FRAME_WIDTH);
         }
