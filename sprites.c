@@ -184,18 +184,17 @@ void add_to_scene(void * scene, void * sprite_frame, int x, int y, int w, int h)
                               (x * frame_row_bytes);
         void * src = sprite_frame + (frame_row_bytes * printed_lines * w);                
         for (int i=0; i<w; i++) {
-            // int * redP = (src+(i*frame_row_bytes));
-            // int * greenP = (src+(i*frame_row_bytes)+4);
-            // int * blueP = (src+(i*frame_row_bytes)+8);
-            // int red = ((*redP) / 256) * -1;
-            // int blue = ((*blueP) / 256) * -1;
-            // int green = ((*greenP) / 256) * -1;
-            // if (red == TRANSPARENT_COLOR_RED &&
-            //     green == TRANSPARENT_COLOR_GREEN &&
-            //     blue == TRANSPARENT_COLOR_BLUE) {
-            //     printf("TRANSPARENT >>> \n\n");
-            //     continue;
-            // }
+            unsigned int * redP = (src+(i*frame_row_bytes));
+            unsigned int * greenP = (src+(i*frame_row_bytes)+1);
+            unsigned int * blueP = (src+(i*frame_row_bytes)+2);
+            uint8_t red = *redP;
+            uint8_t blue = *blueP;
+            uint8_t green = *greenP;
+            if (red == TRANSPARENT_COLOR_RED &&
+                green == TRANSPARENT_COLOR_GREEN &&
+                blue == TRANSPARENT_COLOR_BLUE) {
+                continue;
+            }
             memcpy(dest+(i*frame_row_bytes), src+(i*frame_row_bytes), frame_row_bytes);
         }
         printed_lines += 1;
