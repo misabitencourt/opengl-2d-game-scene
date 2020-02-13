@@ -152,7 +152,7 @@ void mount_bkg_tileset()
     int h_bkg_painted = 0;
 
     // BACKGROUND
-    unsigned int padding = 100;
+    unsigned int padding = 40;
     while (h_bkg_painted <= (SCREEN_HEIGHT - padding)) {
         while (w_bkg_painted <= (SCREEN_WIDTH - padding)) {
             void * dest = current_frame + (h_bkg_painted * SCREEN_WIDTH * frame_row_bytes) + 
