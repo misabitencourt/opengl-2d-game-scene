@@ -22,7 +22,7 @@ Draw(void)
 {
         int i;
         glLoadIdentity();
-        glTranslatef(-0.5, -0.5, -1.0);
+        glTranslatef(-0.7, -0.39, -1.0);
         glRotatef(0, 0,1,0);
         glRotatef(0, 1,0,0);
         glClearColor(0.0, 0.0, 0.0, 0.0);

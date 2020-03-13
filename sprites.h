@@ -11,6 +11,7 @@ const unsigned int SPRITE_CHAR = 1;
 const unsigned int SPRITE_TREE = 2;
 const unsigned int SPRITE_STONE = 3;
 const unsigned int SPRITE_FONT = 4;
+const unsigned int SPRITE_BAT = 5;
 const unsigned int MAX_SPRITES = 100;
 
 const unsigned int SPRITE_FRAME_WIDTH = 49;
@@ -34,6 +35,10 @@ const unsigned int CHAR_ANIMATION_WALKING_RIGHT_END = 9;
 const unsigned int CHAR_ANIMATION_WALKING_UP = 3;
 const unsigned int CHAR_ANIMATION_WALKING_UP_START = 10;
 const unsigned int CHAR_ANIMATION_WALKING_UP_END = 12;
+
+const unsigned int BAT_ANIMATION_FLYING = 0;
+const unsigned int BAT_ANIMATION_FLYING_START = 1;
+const unsigned int BAT_ANIMATION_FLYING_END = 3;
 
 const unsigned int TRANSPARENT_COLOR_RED = 255;
 const unsigned int TRANSPARENT_COLOR_GREEN = 0;

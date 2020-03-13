@@ -3,9 +3,15 @@ Sprite sprite_char;
 Sprite tree_img;
 Sprite stone_img;
 Sprite tileset_img;
+Sprite bat_img;
+const int BAT_GROUP_SIZE = 5;
+Sprite bat_img_group[5];
 Sprite font_img;
 void * current_frame;
 unsigned int starting = 1;
+
+unsigned int bat_delay = 0;
+unsigned int update_bat = 0;
 
  Sprite read_png_file(char * file_name) 
  {
@@ -98,7 +104,7 @@ unsigned int starting = 1;
 void load_sprites()
 {   
     sprite_char = read_png_file("./sprites/char.png");
-    sprite_char.frame_width = 32;
+    sprite_char.frame_width = 32;    
     sprite_char.animation = CHAR_ANIMATION_WALKING_DOWN;
     sprite_char.frame_current = CHAR_ANIMATION_WALKING_DOWN_START;
     sprite_char.frame_start = CHAR_ANIMATION_WALKING_DOWN_START;
@@ -112,6 +118,31 @@ void load_sprites()
     tree_img = read_png_file("./sprites/tree.png");
     stone_img = read_png_file("./sprites/stone.png");
     font_img = read_png_file("./sprites/font.png");
+    
+    bat_img = read_png_file("./sprites/bat.png");    
+    bat_img.frame_width = 32;
+    bat_img.animation = BAT_ANIMATION_FLYING;
+    bat_img.frame_current = BAT_ANIMATION_FLYING_START;
+    bat_img.frame_start = BAT_ANIMATION_FLYING_START;
+    bat_img.frame_end = BAT_ANIMATION_FLYING_END;
+    bat_img.x = 0;
+    bat_img.y = 0;
+    bat_img.frame_delay = 50;
+    bat_img.frame_delay_current = 1;
+    bat_img.height = 32;
+
+    for (int i=0; i<BAT_GROUP_SIZE; i++) {
+        bat_img_group[i].height = 32;
+        bat_img_group[i].frame_width = 32;
+        bat_img_group[i].animation = BAT_ANIMATION_FLYING;
+        bat_img_group[i].frame_current = BAT_ANIMATION_FLYING_START;
+        bat_img_group[i].frame_start = BAT_ANIMATION_FLYING_START;
+        bat_img_group[i].frame_end = BAT_ANIMATION_FLYING_END;
+        bat_img_group[i].x = 0;
+        bat_img_group[i].y = 0;
+        bat_img_group[i].frame_delay = 50;
+        bat_img_group[i].frame_delay_current = 1;
+    }
 }
 
 void * get_sprite_frame_image(Sprite sprite)
@@ -301,7 +332,7 @@ Sprite update_frame(Sprite sprite)
 
 void mount_scene()
 {    
-    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;
+    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;    
 
     // CREATE BACKGROUND
     mount_bkg_tileset();    
@@ -320,6 +351,42 @@ void mount_scene()
         sprite_char.height
     );
     free(sprite_char_frame);
+
+    // BATS    
+    if (bat_delay == 35) {
+        update_bat = 1;
+        bat_delay = 0;
+    } else {
+        update_bat = 0;
+        bat_delay += 1;
+    }
+    for (int i=0;i<BAT_GROUP_SIZE; i++) {        
+        if (update_bat == 1) {
+            bat_img_group[i].frame_current += 1;
+            if (bat_img_group[i].frame_current == BAT_ANIMATION_FLYING_END) {
+                bat_img_group[i].frame_current = BAT_ANIMATION_FLYING_START;
+            }
+            if (bat_img_group[i].x == 0) {
+                bat_img_group[i].x = 1;
+                bat_img_group[i].y = rand() % 600;
+            } else if (bat_img_group[i].x > 550) {
+                bat_img_group[i].x = 0;
+            }
+            bat_img_group[i].x += rand() % 15;
+        }
+        
+        bat_img.frame_current = bat_img_group[i].frame_current;
+        void * bat_frame = get_sprite_frame_image(bat_img);
+        add_to_scene(
+            current_frame, 
+            bat_frame, 
+            bat_img_group[i].x, 
+            bat_img_group[i].y, 
+            bat_img_group[i].frame_width,
+            bat_img_group[i].height
+        );
+        free(bat_frame);
+    }
 
     // MAP OBSTACLES
     for (int i=0; i<MAPS_LEVEL_OBSTACLES_LENGTH; i++) {
