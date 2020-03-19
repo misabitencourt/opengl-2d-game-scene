@@ -15,6 +15,8 @@ unsigned int update_bat = 0;
 unsigned int current_score = 0;
 unsigned int current_score_delay = 0;
 
+int bat_init_delay = 0;
+
 #include "controls.c";
 #include "read_png.c";
 #include "load_sprites.c";
@@ -184,40 +186,44 @@ void mount_scene()
         free(obstacle_frame);
     }
 
-    // BATS    
-    if (bat_delay == 35) {
-        update_bat = 1;
-        bat_delay = 0;
-    } else {
-        update_bat = 0;
-        bat_delay += 1;
-    }
-    for (int i=0;i<BAT_GROUP_SIZE; i++) {        
-        if (update_bat == 1) {
-            bat_img_group[i].frame_current += 1;
-            if (bat_img_group[i].frame_current == BAT_ANIMATION_FLYING_END) {
-                bat_img_group[i].frame_current = BAT_ANIMATION_FLYING_START;
-            }
-            if (bat_img_group[i].x == 0) {
-                bat_img_group[i].x = 1;
-                bat_img_group[i].y = rand() % 750;
-            } else if (bat_img_group[i].x > 550) {
-                bat_img_group[i].x = 0;
-            }
-            bat_img_group[i].x += rand() % 25;
+    // BATS
+    if (bat_init_delay > 5000) {
+        if (bat_delay == 35) {
+            update_bat = 1;
+            bat_delay = 0;
+        } else {
+            update_bat = 0;
+            bat_delay += 1;
         }
-        
-        bat_img.frame_current = bat_img_group[i].frame_current;
-        void * bat_frame = get_sprite_frame_image(bat_img);
-        add_to_scene(
-            current_frame, 
-            bat_frame, 
-            bat_img_group[i].x, 
-            bat_img_group[i].y, 
-            bat_img_group[i].frame_width,
-            bat_img_group[i].height
-        );
-        free(bat_frame);
+        for (int i=0;i<BAT_GROUP_SIZE; i++) {        
+            if (update_bat == 1) {
+                bat_img_group[i].frame_current += 1;
+                if (bat_img_group[i].frame_current == BAT_ANIMATION_FLYING_END) {
+                    bat_img_group[i].frame_current = BAT_ANIMATION_FLYING_START;
+                }
+                if (bat_img_group[i].x == 0) {
+                    bat_img_group[i].x = 1;
+                    bat_img_group[i].y = rand() % 750;
+                } else if (bat_img_group[i].x > 550) {
+                    bat_img_group[i].x = 0;
+                }
+                bat_img_group[i].x += rand() % 25;
+            }
+            
+            bat_img.frame_current = bat_img_group[i].frame_current;
+            void * bat_frame = get_sprite_frame_image(bat_img);
+            add_to_scene(
+                current_frame, 
+                bat_frame, 
+                bat_img_group[i].x, 
+                bat_img_group[i].y, 
+                bat_img_group[i].frame_width,
+                bat_img_group[i].height
+            );
+            free(bat_frame);
+        }
+    } else {
+        bat_init_delay += 1;
     }
 
     // Score
