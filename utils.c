@@ -33,3 +33,28 @@ int collision(int x1, int x2, int y1, int y2, int w1, int w2, int h1, int h2)
 
     return 1;
 }
+
+char * num_chars = "0123456789";
+char get_num_char(int num)
+{
+    if (num > 9)
+    {
+        return 0;
+    }
+    
+    return num_chars[num];
+}
+
+char * int_to_str_4(int num)
+{    
+    if (!num) 
+    {
+        return "0000";
+    }
+    
+    char * res = malloc(sizeof(char) * 5);
+    sprintf(res, "%d", num);
+    res[4] = '\0';
+    
+    return res;
+}

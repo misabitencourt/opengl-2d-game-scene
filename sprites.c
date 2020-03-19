@@ -4,14 +4,16 @@ Sprite tree_img;
 Sprite stone_img;
 Sprite tileset_img;
 Sprite bat_img;
-const int BAT_GROUP_SIZE = 5;
-Sprite bat_img_group[5];
+const int BAT_GROUP_SIZE = 20;
+Sprite bat_img_group[20];
 Sprite font_img;
 void * current_frame;
-unsigned int starting = 1;
 
+unsigned int starting = 1;
 unsigned int bat_delay = 0;
 unsigned int update_bat = 0;
+unsigned int current_score = 0;
+unsigned int current_score_delay = 0;
 
 #include "controls.c";
 #include "read_png.c";
@@ -198,11 +200,11 @@ void mount_scene()
             }
             if (bat_img_group[i].x == 0) {
                 bat_img_group[i].x = 1;
-                bat_img_group[i].y = rand() % 600;
+                bat_img_group[i].y = rand() % 750;
             } else if (bat_img_group[i].x > 550) {
                 bat_img_group[i].x = 0;
             }
-            bat_img_group[i].x += rand() % 15;
+            bat_img_group[i].x += rand() % 25;
         }
         
         bat_img.frame_current = bat_img_group[i].frame_current;
@@ -219,7 +221,12 @@ void mount_scene()
     }
 
     // Score
-    char * text = "0001";
+    current_score_delay += 1;
+    if (current_score_delay == 600) {
+        current_score_delay = 0;
+        current_score += 1;
+    }    
+    char * text = int_to_str_4(current_score);
     void * points_text = get_text_image_line(font_img, text);
     if (points_text != NULL) {
         add_to_scene(
