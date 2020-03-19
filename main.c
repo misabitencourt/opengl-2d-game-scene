@@ -22,9 +22,9 @@ Draw(void)
 {
         int i;
         glLoadIdentity();
-        glTranslatef(-0.7, -0.39, -1.0);
-        glRotatef(0, 0,1,0);
-        glRotatef(0, 1,0,0);
+        glTranslatef(-0.5, -0.5, -1.0);
+        glRotatef(0, 0, 0,0);
+        glRotatef(0, 0,0,0);
         glClearColor(0.0, 0.0, 0.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -42,11 +42,10 @@ Draw(void)
         
         glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); glVertex2f(0.0f, 0.0f);
-        glTexCoord2f(1.0, 0.0); glVertex2f(1.0f, 0.0f);
+        glTexCoord2f(1.0f, 0.0); glVertex2f(1.0f, 0.0f);
         glTexCoord2f(1.0, 1.0); glVertex2f(1.0f, 1.0f);
         glTexCoord2f(0.0, 1.0); glVertex2f(0.0f, 1.0f);
         glEnd();
-
 
         glDisable(GL_TEXTURE_2D);
         glutSwapBuffers();
