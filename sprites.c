@@ -16,11 +16,12 @@ unsigned int current_score = 0;
 unsigned int current_score_delay = 0;
 
 int bat_init_delay = 0;
+int music_repeat_delay = 0;
 
-#include "controls.c";
-#include "read_png.c";
-#include "load_sprites.c";
-#include "collision.c";
+#include "controls.c"
+#include "read_png.c"
+#include "load_sprites.c"
+#include "collision.c"
 
 void * get_sprite_frame_image(Sprite sprite)
 {   
@@ -126,7 +127,7 @@ Sprite update_frame(Sprite sprite)
 
 void mount_scene()
 {    
-    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;    
+    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;
 
     // CREATE BACKGROUND
     mount_bkg_tileset();    
@@ -243,9 +244,19 @@ void mount_scene()
             get_str_length(text) * FONT_FRAME_WIDTH,
             font_img.height
         );
-    }    
+    }
+
+    // Stage music
+    if (music_repeat_delay) {
+        if (++music_repeat_delay > 10000) {
+            music_repeat_delay = 0;
+        }
+    } else {
+        music_repeat_delay = 1;
+        exec_wav("./wav/music.wav");
+    }
 
     if (starting) {
-        starting = 0;
+       starting = 0;
     }
 }

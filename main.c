@@ -6,9 +6,12 @@
 #include <string.h>
 #include <stdarg.h>
 #include <png.h>
+
 #include "maps.h"
 #include "state.h"
 #include "sprites.h"
+
+#include "sound.c"
 #include "font_sprite.c"
 #include "utils.c"
 #include "sprites.c"
