@@ -15,6 +15,7 @@
 #include "sound.c"
 #include "font_sprite.c"
 #include "sprites.c"
+#include "menu_instructions.c"
 
 Scene scene;
 GLenum doubleBuffer;

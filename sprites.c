@@ -18,6 +18,7 @@ unsigned int current_score_delay = 0;
 int bat_init_delay = 0;
 int music_repeat_delay = 0;
 int hit_sound_delay = 0;
+int menu_instructions = 1;
 
 #include "controls.c"
 #include "read_png.c"
@@ -127,14 +128,30 @@ Sprite update_frame(Sprite sprite)
 }
 
 void mount_scene()
-{    
-    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;
-
+{
     // CREATE BACKGROUND
     mount_bkg_tileset();    
+    
     // Controls
     controls();
 
+    // Started flag
+    if (starting) {
+       starting = 0;
+    }
+
+    // ******************     MENUS    ***********************
+    if (menu_instructions) {
+        int menu_active = menu_instructions_scene();
+        if (menu_active) {
+            return;
+        }
+        menu_instructions = 0;
+    }
+
+    // ****************** GAME LOOP START ********************
+    int totalsize = SCREEN_HEIGHT * SCREEN_WIDTH * 4;
+    
     // LIST ACTORS
     sprite_char = update_frame(sprite_char);
     void * sprite_char_frame = get_sprite_frame_image(sprite_char);
@@ -272,9 +289,5 @@ void mount_scene()
     } else {
         music_repeat_delay = 1;
         exec_wav("./wav/music.wav");
-    }
-
-    if (starting) {
-       starting = 0;
     }
 }

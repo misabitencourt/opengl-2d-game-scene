@@ -35,7 +35,7 @@ void * get_text_image_line(Sprite font, char * text)
     {
         char current_char = str_char_at(text, i);
         unsigned int char_index = alphabet_get_char_position(current_char);        
-        if ((char_index < 1 || char_index == 999) && (current_char != ' '))
+        if ((char_index < 0 || char_index == 999) && (current_char != ' '))
         {
             continue;
         }
