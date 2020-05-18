@@ -17,39 +17,6 @@ unsigned int alphabet_get_char_position(char c)
     return 0;
 }
 
-char str_char_at(char * text, unsigned int index)
-{
-    char * current = malloc(sizeof(char));
-    int char_count = 0; 
-    do 
-    {        
-        memcpy(current, text + (char_count * sizeof(char)), sizeof(char));
-        if (char_count == index) 
-        {
-            char result = *current;
-            free(current);
-            return result;
-        }
-        char_count++;
-    } while(current != '\0');
-
-    return '\0';
-}
-
-int get_str_length(char * text)
-{
-    char current;
-    int char_count = 0;
-    do 
-    {
-        char * current_pointer = text + (char_count * sizeof(char));
-        current = *current_pointer;
-        char_count++;
-    } while(current != '\0');
-
-    return char_count-1;
-}
-
 void * get_text_image_line(Sprite font, char * text)
 {
     unsigned int text_length = 0;    

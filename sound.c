@@ -17,6 +17,7 @@ callback_data_s sound_data;
 
 static void exec_wav(char * wav_file)
 {
+    // TODO create loader
     printf(">>>>>>> %s\n", wav_file);
     SNDFILE *file;
     PaError error;

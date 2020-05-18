@@ -1,4 +1,50 @@
 
+int get_str_length(char * text)
+{
+    char current;
+    int char_count = 0;
+    do 
+    {
+        char * current_pointer = text + (char_count * sizeof(char));
+        current = *current_pointer;
+        char_count++;
+    } while(current != '\0');
+
+    return char_count-1;
+}
+
+int get_str_char_position(char * text, char c) 
+{
+    for (int i=0; i<get_str_length(text); i++)
+    {
+        if (text[i] == c)
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+char str_char_at(char * text, unsigned int index)
+{
+    char * current = malloc(sizeof(char));
+    int char_count = 0; 
+    do 
+    {        
+        memcpy(current, text + (char_count * sizeof(char)), sizeof(char));
+        if (char_count == index) 
+        {
+            char result = *current;
+            free(current);
+            return result;
+        }
+        char_count++;
+    } while(current != '\0');
+
+    return '\0';
+}
+
 int collision(int x1, int x2, int y1, int y2, int w1, int w2, int h1, int h2)
 {
     // printf("\r\nx1: %i, x2: %i, y1: %i, y2: %i, w1: %i, w2: %i, h1: %i, h2: %i",

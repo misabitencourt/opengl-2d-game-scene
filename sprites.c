@@ -4,7 +4,7 @@ Sprite tree_img;
 Sprite stone_img;
 Sprite tileset_img;
 Sprite bat_img;
-const int BAT_GROUP_SIZE = 20;
+const int BAT_GROUP_SIZE = 15;
 Sprite bat_img_group[20];
 Sprite font_img;
 void * current_frame;
@@ -17,6 +17,7 @@ unsigned int current_score_delay = 0;
 
 int bat_init_delay = 0;
 int music_repeat_delay = 0;
+int hit_sound_delay = 0;
 
 #include "controls.c"
 #include "read_png.c"
@@ -188,7 +189,7 @@ void mount_scene()
     }
 
     // BATS
-    if (bat_init_delay > 5000) {
+    if (bat_init_delay > 3000) {
         if (bat_delay == 35) {
             update_bat = 1;
             bat_delay = 0;
@@ -197,6 +198,23 @@ void mount_scene()
             bat_delay += 1;
         }
         for (int i=0;i<BAT_GROUP_SIZE; i++) {        
+            // Bat collision
+            int hit = collision(
+                sprite_char.x, 
+                bat_img_group[i].x, 
+                sprite_char.y,
+                bat_img_group[i].y, 
+                sprite_char.frame_width, 
+                bat_img_group[i].frame_width, 
+                sprite_char.height, 
+                bat_img_group[i].height
+            );
+            if (hit_sound_delay) {
+                hit_sound_delay--;
+            } else if (hit) {
+                hit_sound_delay = 5000;
+                exec_wav("./wav/punch.wav");
+            }
             if (update_bat == 1) {
                 bat_img_group[i].frame_current += 1;
                 if (bat_img_group[i].frame_current == BAT_ANIMATION_FLYING_END) {
@@ -204,11 +222,11 @@ void mount_scene()
                 }
                 if (bat_img_group[i].x == 0) {
                     bat_img_group[i].x = 1;
-                    bat_img_group[i].y = rand() % 750;
-                } else if (bat_img_group[i].x > 550) {
+                    bat_img_group[i].y = rand() % 790;
+                } else if (bat_img_group[i].x > 590) {
                     bat_img_group[i].x = 0;
                 }
-                bat_img_group[i].x += rand() % 25;
+                bat_img_group[i].x += rand() % 15;
             }
             
             bat_img.frame_current = bat_img_group[i].frame_current;
@@ -248,7 +266,7 @@ void mount_scene()
 
     // Stage music
     if (music_repeat_delay) {
-        if (++music_repeat_delay > 10000) {
+        if (++music_repeat_delay > 13000) {
             music_repeat_delay = 0;
         }
     } else {
